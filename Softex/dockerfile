@@ -1,0 +1,28 @@
+FROM python:3.8-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+      apache2 \
+      php \
+      php-mysql \
+      mariadb-server \
+      wget \
+      tar && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget "https://www.adminer.org/latest.php" -O /var/www/html/adminer.php
+
+EXPOSE 80 3306 8501
+
+WORKDIR /app
+
+COPY codigos/ codigos/
+COPY conf/ .
+
+RUN pip install --upgrade pip && pip install -r codigos/requirements.txt
+
+RUN chmod +x entrypoint.sh
+
+CMD ["./entrypoint.sh"]
